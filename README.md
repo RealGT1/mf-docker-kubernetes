@@ -1,18 +1,30 @@
-docker compose up --build
+## Prerequisites
 
-kubectl apply -f client-deployment.yaml
-kubectl apply -f client-service.yaml
-kubectl apply -f server-deployment.yaml
-kubectl apply -f server-service.yaml
+Before you begin, ensure you have met the following requirements:
+- Docker
+- Kubernetes
+- kubectl
 
-kubectl get deployments
-kubectl get services
+## Commands
+- docker compose up --build
 
-kubectl get pods
+- kubectl apply -f client-deployment.yaml
+- kubectl apply -f client-service.yaml
+- kubectl apply -f server-deployment.yaml
+- kubectl apply -f server-service.yaml
+
+- kubectl get deployments
+- kubectl get services
+
+- kubectl get pods
 
 
-kubectl delete -f client-deployment.yaml
-kubectl delete -f server-deployment.yaml
-kubectl apply -f client-deployment.yaml
-kubectl apply -f server-deployment.yaml
-http://localhost:31535
+- kubectl delete -f client-deployment.yaml
+- kubectl delete -f server-deployment.yaml
+- kubectl apply -f client-deployment.yaml
+- kubectl apply -f server-deployment.yaml
+- http://localhost:31535
+
+
+
+
