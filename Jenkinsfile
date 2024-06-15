@@ -9,11 +9,6 @@ pipeline {
         K8S_SERVER_DEPLOYMENT = './server/server-deployment.yaml'
     }
 
-    tools {
-        // Specify Docker installation configured in Jenkins
-        dockerTool 'Docker Desktop'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -26,7 +21,7 @@ pipeline {
             steps {
                 script {
                     // Build Client Docker image
-                    sh "docker build -t ${CLIENT_IMAGE}:latest ./client"
+                    docker.build("${CLIENT_IMAGE}:latest", "./client")
                 }
             }
         }
@@ -35,7 +30,7 @@ pipeline {
             steps {
                 script {
                     // Build Server Docker image
-                    sh "docker build -t ${SERVER_IMAGE}:latest ./server"
+                    docker.build("${SERVER_IMAGE}:latest", "./server")
                 }
             }
         }
@@ -44,7 +39,7 @@ pipeline {
             steps {
                 script {
                     // Run your Client tests
-                    sh "docker run --rm ${CLIENT_IMAGE}:latest npm test"
+                    docker.image("${CLIENT_IMAGE}:latest").run("--rm", "npm", "test")
                 }
             }
         }
@@ -53,7 +48,7 @@ pipeline {
             steps {
                 script {
                     // Run your Server tests
-                    sh "docker run --rm ${SERVER_IMAGE}:latest pytest"
+                    docker.image("${SERVER_IMAGE}:latest").run("--rm", "pytest")
                 }
             }
         }
@@ -62,8 +57,9 @@ pipeline {
             steps {
                 script {
                     // Push the Client image to your local Docker registry
-                    sh "docker tag ${CLIENT_IMAGE}:latest ${DOCKER_REGISTRY}/${CLIENT_IMAGE}:latest"
-                    sh "docker push ${DOCKER_REGISTRY}/${CLIENT_IMAGE}:latest"
+                    docker.withRegistry("${DOCKER_REGISTRY}") {
+                        docker.image("${CLIENT_IMAGE}:latest").push()
+                    }
                 }
             }
         }
@@ -72,8 +68,9 @@ pipeline {
             steps {
                 script {
                     // Push the Server image to your local Docker registry
-                    sh "docker tag ${SERVER_IMAGE}:latest ${DOCKER_REGISTRY}/${SERVER_IMAGE}:latest"
-                    sh "docker push ${DOCKER_REGISTRY}/${SERVER_IMAGE}:latest"
+                    docker.withRegistry("${DOCKER_REGISTRY}") {
+                        docker.image("${SERVER_IMAGE}:latest").push()
+                    }
                 }
             }
         }
@@ -91,4 +88,14 @@ pipeline {
 
     post {
         always {
-            // Clean up Dock
+            // Clean up Docker resources
+            sh 'docker system prune -f'
+        }
+        success {
+            echo 'Build and Deployment succeeded!'
+        }
+        failure {
+            echo 'Build or Deployment failed!'
+        }
+    }
+}
