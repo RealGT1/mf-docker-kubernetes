@@ -13,7 +13,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout code from your GitHub repository
-                git url: 'https://github.com/RealGT1/mf-docker-kubernetes.git', branch: 'main' // Update URL
+                git url: 'https://github.com/RealGT1/mf-docker-kubernetes.git', branch: 'main'
             }
         }
 
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     // Build Client Docker image
-                    sh 'docker build -t ${CLIENT_IMAGE}:latest ./client'
+                    sh "docker build -t ${CLIENT_IMAGE}:latest ./client"
                 }
             }
         }
@@ -30,7 +30,7 @@ pipeline {
             steps {
                 script {
                     // Build Server Docker image
-                    sh 'docker build -t ${SERVER_IMAGE}:latest ./server'
+                    sh "docker build -t ${SERVER_IMAGE}:latest ./server"
                 }
             }
         }
@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script {
                     // Run your Client tests
-                    sh 'docker run --rm ${CLIENT_IMAGE}:latest npm test' // Update with actual test command
+                    sh "docker run --rm ${CLIENT_IMAGE}:latest npm test"
                 }
             }
         }
@@ -48,7 +48,7 @@ pipeline {
             steps {
                 script {
                     // Run your Server tests
-                    sh 'docker run --rm ${SERVER_IMAGE}:latest pytest' // Update with actual test command
+                    sh "docker run --rm ${SERVER_IMAGE}:latest pytest"
                 }
             }
         }
@@ -57,8 +57,8 @@ pipeline {
             steps {
                 script {
                     // Push the Client image to your local Docker registry
-                    sh 'docker tag ${CLIENT_IMAGE}:latest ${DOCKER_REGISTRY}/${CLIENT_IMAGE}:latest'
-                    sh 'docker push ${DOCKER_REGISTRY}/${CLIENT_IMAGE}:latest'
+                    sh "docker tag ${CLIENT_IMAGE}:latest ${DOCKER_REGISTRY}/${CLIENT_IMAGE}:latest"
+                    sh "docker push ${DOCKER_REGISTRY}/${CLIENT_IMAGE}:latest"
                 }
             }
         }
@@ -67,8 +67,8 @@ pipeline {
             steps {
                 script {
                     // Push the Server image to your local Docker registry
-                    sh 'docker tag ${SERVER_IMAGE}:latest ${DOCKER_REGISTRY}/${SERVER_IMAGE}:latest'
-                    sh 'docker push ${DOCKER_REGISTRY}/${SERVER_IMAGE}:latest'
+                    sh "docker tag ${SERVER_IMAGE}:latest ${DOCKER_REGISTRY}/${SERVER_IMAGE}:latest"
+                    sh "docker push ${DOCKER_REGISTRY}/${SERVER_IMAGE}:latest"
                 }
             }
         }
@@ -77,8 +77,8 @@ pipeline {
             steps {
                 script {
                     // Deploy the Client and Server to Kubernetes
-                    sh 'kubectl apply -f ${K8S_CLIENT_DEPLOYMENT}'
-                    sh 'kubectl apply -f ${K8S_SERVER_DEPLOYMENT}'
+                    sh "kubectl apply -f ${K8S_CLIENT_DEPLOYMENT}"
+                    sh "kubectl apply -f ${K8S_SERVER_DEPLOYMENT}"
                 }
             }
         }
