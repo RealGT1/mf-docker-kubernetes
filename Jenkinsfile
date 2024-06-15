@@ -9,6 +9,11 @@ pipeline {
         K8S_SERVER_DEPLOYMENT = './server/server-deployment.yaml'
     }
 
+    tools {
+        // Specify Docker installation configured in Jenkins
+        dockerTool 'Docker Desktop'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -86,14 +91,4 @@ pipeline {
 
     post {
         always {
-            // Clean up Docker resources
-            sh 'docker system prune -f'
-        }
-        success {
-            echo 'Build and Deployment succeeded!'
-        }
-        failure {
-            echo 'Build or Deployment failed!'
-        }
-    }
-}
+            // Clean up Dock
