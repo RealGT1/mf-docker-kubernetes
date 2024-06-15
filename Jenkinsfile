@@ -2,9 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HOST = 'tcp://localhost:2375'
+        DOCKER_REGISTRY = 'localhost:5000'
         CLIENT_IMAGE = 'mf3-client'
         SERVER_IMAGE = 'mf3-server'
+        K8S_CLIENT_DEPLOYMENT = './client/client-deployment.yaml'
+        K8S_SERVER_DEPLOYMENT = './server/server-deployment.yaml'
     }
 
     stages {
@@ -55,7 +57,7 @@ pipeline {
             steps {
                 script {
                     // Push the Client image to your local Docker registry
-                    docker.withRegistry("http://${DOCKER_HOST}") {
+                    docker.withRegistry("${DOCKER_REGISTRY}") {
                         docker.image("${CLIENT_IMAGE}:latest").push()
                     }
                 }
@@ -66,9 +68,19 @@ pipeline {
             steps {
                 script {
                     // Push the Server image to your local Docker registry
-                    docker.withRegistry("http://${DOCKER_HOST}") {
+                    docker.withRegistry("${DOCKER_REGISTRY}") {
                         docker.image("${SERVER_IMAGE}:latest").push()
                     }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Deploy the Client and Server to Kubernetes
+                    sh "kubectl apply -f ${K8S_CLIENT_DEPLOYMENT}"
+                    sh "kubectl apply -f ${K8S_SERVER_DEPLOYMENT}"
                 }
             }
         }
@@ -80,10 +92,10 @@ pipeline {
             sh 'docker system prune -f'
         }
         success {
-            echo 'Build and image push succeeded!'
+            echo 'Build and Deployment succeeded!'
         }
         failure {
-            echo 'Build or image push failed!'
+            echo 'Build or Deployment failed!'
         }
     }
 }
